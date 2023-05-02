@@ -15,50 +15,72 @@ import os
 def multi_eshop():
     print("Hello from the new process: Eshop")
     lista='rowlisteshop'
+    tabela_='eshop'
+    criar_banco(tabela_)
     eshopjogo()
-    inserir_banco(lista)
+    eshop_assinatura()
+    inserir_banco(lista,tabela_)
 
 def multi_nuuvem():
     print("Hello from the new process:Nuuvem")
     lista='rowlistnuuvem'
+    tabela_='nuuvem'
+    criar_banco(tabela_)
     nuuvemgame()
-    inserir_banco(lista)
+    inserir_banco(lista,tabela_)
 
 def multi_psn():
     print("Hello from the new process: PSN ")
     lista='rowlistpsn'
+    tabela_='psn'
+    criar_banco(tabela_)
     psnjogo()
-    inserir_banco(lista)
+    psn_assinatura()
+    inserir_banco(lista,tabela_)
 
 def multi_steam():
     print("Hello from the new process: Steam ")
     lista='rowliststeam'
+    tabela_='steam'
+    criar_banco(tabela_)
     steam_()
-    inserir_banco(lista)
+    inserir_banco(lista,tabela_)
     
 
 
 
-def inserir_banco(lista):
+def inserir_banco(lista,tabela_):
             conexao=sqlite3.connect("jogos.db")
             cursor=conexao.cursor()
             today = date.today()
             data = today.strftime("%d/%m/%Y")
             for r in eval(lista):
                 loja,jogo,preco,pdesconto,poriginal,linkcompleto,tipo=r
-                cursor.execute(f"SELECT * FROM {loja} WHERE  loja = ? AND jogo = ? AND preco = ? AND pdesconto = ? AND poriginal = ? AND linkcompleto = ? AND tipo = ? AND data = ?", (loja,jogo,preco,pdesconto,poriginal,linkcompleto,tipo,data))
+                cursor.execute(f"SELECT * FROM {tabela_} WHERE  loja = ? AND jogo = ? AND preco = ? AND pdesconto = ? AND poriginal = ? AND linkcompleto = ? AND tipo = ? AND data = ?", (loja,jogo,preco,pdesconto,poriginal,linkcompleto,tipo,data))
                 linha_existente = cursor.fetchone()
                 #print(f'Nome:{nome}\nTipo:{tipo}\nP Original:{preco}\nPromo:{promo}\n%Desc:{percent_}\nLink:{link}')
                 if linha_existente is None :
-                    cursor.execute(f'''INSERT INTO {loja} (loja,jogo,preco,pdesconto,poriginal,linkcompleto,tipo,data)
+                    cursor.execute(f'''INSERT INTO {tabela_} (loja,jogo,preco,pdesconto,poriginal,linkcompleto,tipo,data)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)''',
                 (loja,jogo,preco,pdesconto,poriginal,linkcompleto,tipo,data))
             conexao.commit()
             cursor.close()
             conexao.close()
-        
-            print('Inserido na tabela ',loja)
-
+            print('Inserido na tabela ',loja.upper())
+def criar_banco(tabela_):
+                try:
+                        conexao=sqlite3.connect("jogos.db")
+                        cursor=conexao.cursor()
+                        
+                        cursor.execute(f'''CREATE TABLE {tabela_}
+                                (nome TEXT,tipo TEXT,preco TEXT,promo TEXT,percent_ TEXT,link TEXT,data TEXT)''')
+                        
+                        conexao.commit()
+                        cursor.close()
+                        conexao.close()
+                        print('criou')
+                except:
+                        pass   
     
 if __name__ == '__main__':
     # Start a new process

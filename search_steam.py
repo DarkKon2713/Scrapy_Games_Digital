@@ -32,7 +32,6 @@ def steam_():
                 paginas=paginas+1
             for i in range(1,paginas+1):
                 start=(i-1)*jogos_por_pagina
-                print('STEAM:',i)
                 link_pesquisa=f'https://store.steampowered.com/search/results/?query&start={start}&count=100&dynamic_data=&force_infinite=1&specials=1&ndl=1&snr=1_7_7_2300_7&infinite=1'
                 search_steam(link_pesquisa)
         except:
