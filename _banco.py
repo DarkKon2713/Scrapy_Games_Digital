@@ -16,9 +16,11 @@ def pesquisa_banco():
             try:
                 conexao=sqlite3.connect("jogos.db")
                 cursor=conexao.cursor()
-                if filtro=='jogo':
+                if pesquisa_line!='':
                     cursor.execute(f"SELECT * FROM {loja_} WHERE jogo LIKE '%{pesquisa_line}%' order by  {filtro} {order_by};")
-                if filtro=='preco':
+                if pesquisa_line=='':
+                    cursor.execute(f"SELECT * FROM {loja_}  order by  {filtro} {order_by};")
+                if pesquisa_line=='#x#':
                     cursor.execute(f"SELECT * FROM {loja_} ORDER BY LENGTH ({filtro}) {order_by};")
                 resultado=cursor.fetchone()
                 while True:
