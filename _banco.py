@@ -44,4 +44,4 @@ def print_(data_pesquisa):
         if data_pesquisa==data:
             print(loja.upper(),jogo,preco,pdesconto,poriginal,linkcompleto,tipo,data)
     print('')
-pesquisa_banco()
+print(len('https://loja.karcher.com.br/_v/segment/graphql/v1?workspace=master&maxAge=short&appsEtag=remove&domain=store&locale=pt-BR&operationName=productSearchV3&variables=%7B%7D&extensions=%7B%22persistedQuery%22%3A%7B%22version%22%3A1%2C%22sha256Hash%22%3A%2240e207fe75d9dce4dfb3154442da4615f2b097b53887a0ae5449eb92d42e84db%22%2C%22sender%22%3A%22vtex.store-resources%400.x%22%2C%22provider%22%3A%22vtex.search-graphql%400.x%22%7D%2C%22variables%22%3A%22eyJoaWRlVW5hdmFpbGFibGVJdGVtcyI6ZmFsc2UsInNrdXNGaWx0ZXIiOiJBTEwiLCJwcm9kdWN0T3JpZ2luVnRleCI6ZmFsc2UsIm1hcCI6ImMiLCJxdWVyeSI6ImxhdmFkb3Jhcy1kZS1hbHRhLXByZXNzYW8iLCJmcm9tIjoxMiwidG8iOjIzLCJzZWxlY3RlZEZhY2V0cyI6W3sia2V5IjoiYyIsInZhbHVlIjoibGF2YWRvcmFzLWRlLWFsdGEtcHJlc3NhbyJ9XX0%3D%3D%22%7D'))

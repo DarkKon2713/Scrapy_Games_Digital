@@ -14,42 +14,52 @@ import os
 
 def multi_eshop():
     print("Hello from the new process: Eshop")
-    lista='rowlisteshop'
     tabela_='eshop'
     criar_banco(tabela_)
     eshopjogo()
     eshop_assinatura()
-    inserir_banco(lista,tabela_)
+    print(f"Busca {tabela_} completa. No aguardo para inserir no banco")
+    
 
 def multi_nuuvem():
     print("Hello from the new process:Nuuvem")
-    lista='rowlistnuuvem'
     tabela_='nuuvem'
     criar_banco(tabela_)
     nuuvemgame()
-    inserir_banco(lista,tabela_)
-
+    print(f"Busca {tabela_} completa. No aguardo para inserir no banco")
+    
 def multi_psn():
     print("Hello from the new process: PSN ")
-    lista='rowlistpsn'
     tabela_='psn'
     criar_banco(tabela_)
     psnjogo()
     psn_assinatura()
-    inserir_banco(lista,tabela_)
+    print(f"Busca {tabela_} completa. No aguardo para inserir no banco")
+    
 
 def multi_steam():
     print("Hello from the new process: Steam ")
-    lista='rowliststeam'
     tabela_='steam'
     criar_banco(tabela_)
     steam_()
-    inserir_banco(lista,tabela_)
+    print(f"Busca {tabela_} completa. No aguardo para inserir no banco")
     
+    
+def inserir_banco():
+    lista='rowliststeam'
+    tabela_='steam'
+    inserir_tabela(lista,tabela_)
+    lista='rowlistpsn'
+    tabela_='psn'
+    inserir_tabela(lista,tabela_)
+    lista='rowlistnuuvem'
+    tabela_='nuuvem'
+    inserir_tabela(lista,tabela_)
+    lista='rowlisteshop'
+    tabela_='eshop'
+    inserir_tabela(lista,tabela_)
 
-
-
-def inserir_banco(lista,tabela_):
+def inserir_tabela(lista,tabela_):
             conexao=sqlite3.connect("jogos.db")
             cursor=conexao.cursor()
             today = date.today()
@@ -63,6 +73,7 @@ def inserir_banco(lista,tabela_):
                     cursor.execute(f'''INSERT INTO {tabela_} (loja,jogo,preco,pdesconto,poriginal,linkcompleto,tipo,data)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)''',
                 (loja,jogo,preco,pdesconto,poriginal,linkcompleto,tipo,data))
+            
             conexao.commit()
             cursor.close()
             conexao.close()
@@ -96,6 +107,7 @@ if __name__ == '__main__':
     p_nuuvem.join() 
     p_psn.join()
     p_steam.join()
+    inserir_banco()
     
     
 
