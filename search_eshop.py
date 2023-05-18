@@ -1,7 +1,8 @@
 from bs4 import BeautifulSoup 
 import requests 
 import json
-
+import sqlite3
+from datetime import date
 rowlisteshop=[]
 header_eshop={'Accept': '*/*',
 'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7',
@@ -20,7 +21,7 @@ header_eshop={'Accept': '*/*',
 'x-algolia-application-id': 'U3B6GR4UA3'}
 
 def eshopjogo():
-    
+    criar_banco()
     link='https://u3b6gr4ua3-dsn.algolia.net/1/indexes/*/queries?x-algolia-agent=Algolia%20for%20JavaScript%20(4.14.2)%3B%20Browser%3B%20JS%20Helper%20(3.11.1)%3B%20react%20(17.0.2)%3B%20react-instantsearch%20(6.38.1)'
     loja='eshop'
     try:
@@ -49,7 +50,8 @@ def eshopjogo():
                 rowlisteshop.append((loja,jogo,preco,pdesconto,poriginal,linkcompleto,tipo))
     except:
         pass
-
+    eshop_assinatura()
+    inserir_banco()
 def eshop_assinatura():
     loja='eshop'
     tipo='Assinatura'
@@ -68,3 +70,34 @@ def eshop_assinatura():
             rowlisteshop.append((loja,jogo,preco,pdesconto,poriginal,linkcompleto,tipo))
     except:
         print('Erro eshop assinatura')
+
+def criar_banco():
+    try:
+            conexao=sqlite3.connect("_jogos.db")
+            cursor=conexao.cursor()
+            cursor.execute(f'''CREATE TABLE eshop
+                    (loja TEXT,  jogo TEXT,  preco TEXT,  pdesconto TEXT,  poriginal TEXT,  linkcompleto TEXT,  tipo TEXT,  data TEXT)''')
+            conexao.commit()
+            cursor.close()
+            conexao.close()
+            print('criou')
+    except:
+        pass   
+def inserir_banco():
+        conexao=sqlite3.connect("_jogos.db")
+        cursor=conexao.cursor()
+        today = date.today()
+        data = today.strftime("%d/%m/%Y")
+        for r in rowlisteshop:
+            loja,jogo,preco,pdesconto,poriginal,linkcompleto,tipo=r
+            cursor.execute(f"SELECT * FROM eshop WHERE  loja = ? AND jogo = ? AND preco = ? AND pdesconto = ? AND poriginal = ? AND linkcompleto = ? AND tipo = ? AND data = ?", (loja,jogo,preco,pdesconto,poriginal,linkcompleto,tipo,data))
+            linha_existente = cursor.fetchone()
+            #print(f'Nome:{nome}\nTipo:{tipo}\nP Original:{preco}\nPromo:{promo}\n%Desc:{percent_}\nLink:{link}')
+            if linha_existente is None :
+                cursor.execute(f'''INSERT INTO eshop (loja,jogo,preco,pdesconto,poriginal,linkcompleto,tipo,data)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)''',
+            (loja,jogo,preco,pdesconto,poriginal,linkcompleto,tipo,data))
+        conexao.commit()
+        cursor.close()
+        conexao.close()
+        print('Loja concluida: eshop ')

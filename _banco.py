@@ -14,7 +14,7 @@ def pesquisa_banco():
     order_by='ASC'
     for loja_ in lojas:
             try:
-                conexao=sqlite3.connect("jogos.db")
+                conexao=sqlite3.connect("_jogos.db")
                 cursor=conexao.cursor()
                 if pesquisa_line!='':
                     cursor.execute(f"SELECT * FROM {loja_} WHERE jogo LIKE '%{pesquisa_line}%' order by  {filtro} {order_by};")
@@ -44,4 +44,5 @@ def print_(data_pesquisa):
         if data_pesquisa==data:
             print(loja.upper(),jogo,preco,pdesconto,poriginal,linkcompleto,tipo,data)
     print('')
+
 pesquisa_banco()

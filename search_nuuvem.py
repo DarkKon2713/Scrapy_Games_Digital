@@ -1,11 +1,13 @@
 from bs4 import BeautifulSoup 
 import re
 import requests
-
+import sqlite3
+from datetime import date
 rowlistnuuvem=[]
 header_nuuvem={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36 OPR/96.0.0.0 (Edition std-1)'}
 
 def nuuvemgame():
+    criar_banco()
     linkjogo='https://www.nuuvem.com/br-pt/catalog/platforms/pc/price/promo/types/games/sort/bestselling/sort-mode/desc/page/1'     
     tipo='Jogo'  
     scrapynuuvem(linkjogo,tipo)  
@@ -16,6 +18,7 @@ def nuuvemgame():
     tipo='Pacote'  
     scrapynuuvem(linkjogo,tipo) 
     nuuvemgamegift() 
+    inserir_banco()
     
 def scrapynuuvem(linkjogo,tipo):
     try:
@@ -197,3 +200,34 @@ def scrapynuuvemgift(linkjogo):
             a='x'   
     except:
         a='x'      
+
+def criar_banco():
+    try:
+        conexao=sqlite3.connect("_jogos.db")
+        cursor=conexao.cursor()
+        cursor.execute(f'''CREATE TABLE nuuvem
+                (loja TEXT,  jogo TEXT,  preco TEXT,  pdesconto TEXT,  poriginal TEXT,  linkcompleto TEXT,  tipo TEXT,  data TEXT)''')
+        conexao.commit()
+        cursor.close()
+        conexao.close()
+        print('Criou')
+    except:
+        pass  
+def inserir_banco():
+        conexao=sqlite3.connect("_jogos.db")
+        cursor=conexao.cursor()
+        today = date.today()
+        data = today.strftime("%d/%m/%Y")
+        for r in rowlistnuuvem:
+            loja,jogo,preco,pdesconto,poriginal,linkcompleto,tipo=r
+            cursor.execute(f"SELECT * FROM nuuvem WHERE  loja = ? AND jogo = ? AND preco = ? AND pdesconto = ? AND poriginal = ? AND linkcompleto = ? AND tipo = ? AND data = ?", (loja,jogo,preco,pdesconto,poriginal,linkcompleto,tipo,data))
+            linha_existente = cursor.fetchone()
+            #print(f'Nome:{nome}\nTipo:{tipo}\nP Original:{preco}\nPromo:{promo}\n%Desc:{percent_}\nLink:{link}')
+            if linha_existente is None :
+                cursor.execute(f'''INSERT INTO nuuvem (loja,jogo,preco,pdesconto,poriginal,linkcompleto,tipo,data)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)''',
+            (loja,jogo,preco,pdesconto,poriginal,linkcompleto,tipo,data))
+        conexao.commit()
+        cursor.close()
+        conexao.close()
+        print('Loja concluida: nuuvem ')

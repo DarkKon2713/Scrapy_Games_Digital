@@ -3,7 +3,8 @@ import re
 from time import sleep
 import requests 
 import json
-
+import sqlite3
+from datetime import date
 rowliststeam=[]
 header_steam={'Accept': 'text/javascript, text/html, application/xml, text/xml, */*',
 'Accept-Encoding': 'gzip, deflate, br',
@@ -22,6 +23,7 @@ header_steam={'Accept': 'text/javascript, text/html, application/xml, text/xml, 
 'X-Prototype-Version': '1.7',
 'X-Requested-With': 'XMLHttpRequest'}
 def steam_():
+        criar_banco()
         try:
             link_steam='https://store.steampowered.com/search/results/?query&start=50&count=50&dynamic_data=&force_infinite=1&specials=1&ndl=1&snr=1_7_7_2300_7&infinite=1'
             match=requests.get(link_steam ,headers=header_steam).json()
@@ -36,6 +38,7 @@ def steam_():
                 search_steam(link_pesquisa)
         except:
              print('steam fora do ar')
+        inserir_banco()
 def search_steam(link_pesquisa):
         loja='steam'
         match=requests.get(link_pesquisa ,headers=header_steam).json()
@@ -72,4 +75,33 @@ def search_steam(link_pesquisa):
                     pdesconto=pdesconto.replace('%','')
                     rowliststeam.append((loja,jogo,preco,pdesconto,poriginal,linkcompleto,tipo))
                     
-         
+def criar_banco():
+    try:
+            conexao=sqlite3.connect("_jogos.db")
+            cursor=conexao.cursor()
+            cursor.execute(f'''CREATE TABLE steam
+                     (loja TEXT,  jogo TEXT,  preco TEXT,  pdesconto TEXT,  poriginal TEXT,  linkcompleto TEXT,  tipo TEXT,  data TEXT)''')
+            conexao.commit()
+            cursor.close()
+            conexao.close()
+            print('criou')
+    except:
+            pass   
+def inserir_banco():
+        conexao=sqlite3.connect("_jogos.db")
+        cursor=conexao.cursor()
+        today = date.today()
+        data = today.strftime("%d/%m/%Y")
+        for r in rowliststeam:
+            loja,jogo,preco,pdesconto,poriginal,linkcompleto,tipo=r
+            cursor.execute(f"SELECT * FROM steam WHERE  loja = ? AND jogo = ? AND preco = ? AND pdesconto = ? AND poriginal = ? AND linkcompleto = ? AND tipo = ? AND data = ?", (loja,jogo,preco,pdesconto,poriginal,linkcompleto,tipo,data))
+            linha_existente = cursor.fetchone()
+            #print(f'Nome:{nome}\nTipo:{tipo}\nP Original:{preco}\nPromo:{promo}\n%Desc:{percent_}\nLink:{link}')
+            if linha_existente is None :
+                cursor.execute(f'''INSERT INTO steam (loja,jogo,preco,pdesconto,poriginal,linkcompleto,tipo,data)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)''',
+            (loja,jogo,preco,pdesconto,poriginal,linkcompleto,tipo,data))
+        conexao.commit()
+        cursor.close()
+        conexao.close()
+        print('Loja concluida: steam ')

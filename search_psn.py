@@ -1,5 +1,6 @@
 import requests 
-
+import sqlite3
+from datetime import date
 rowlistpsn=[]
 headers_psn={'accept': 'application/json',
 'accept-encoding': 'gzip, deflate, br',
@@ -42,6 +43,10 @@ def psnjogo():
             size=qtdjogos%limite_json
             offset=(qtdjogos-size)+1
             request_psn(offset,size,qtdjogos,jogo_atual)
+
+    criar_banco()
+    psn_assinatura()
+    inserir_banco()
     
     
         
@@ -102,3 +107,33 @@ def psn_assinatura():
                 poriginal=poriginal.replace('R$','').replace(',','.')
                
             rowlistpsn.append((loja,jogo,preco,pdesconto,poriginal,linkcompleto,tipo))
+def criar_banco():
+    try:
+        conexao=sqlite3.connect("_jogos.db")
+        cursor=conexao.cursor()
+        cursor.execute(f'''CREATE TABLE psn
+                (loja TEXT,  jogo TEXT,  preco TEXT,  pdesconto TEXT,  poriginal TEXT,  linkcompleto TEXT,  tipo TEXT,  data TEXT)''')
+        conexao.commit()
+        cursor.close()
+        conexao.close()
+        print('Criou')
+    except:
+        pass
+              
+def inserir_banco():
+        conexao=sqlite3.connect("_jogos.db")
+        cursor=conexao.cursor()
+        today = date.today()
+        data = today.strftime("%d/%m/%Y")
+        for r in rowlistpsn:
+            loja,jogo,preco,pdesconto,poriginal,linkcompleto,tipo=r
+            cursor.execute(f"SELECT * FROM psn WHERE  loja = ? AND jogo = ? AND preco = ? AND pdesconto = ? AND poriginal = ? AND linkcompleto = ? AND tipo = ? AND data = ?", (loja,jogo,preco,pdesconto,poriginal,linkcompleto,tipo,data))
+            linha_existente = cursor.fetchone()
+            #print(f'Nome:{nome}\nTipo:{tipo}\nP Original:{preco}\nPromo:{promo}\n%Desc:{percent_}\nLink:{link}')
+            if linha_existente is None :
+                cursor.execute(f'''INSERT INTO psn (loja,jogo,preco,pdesconto,poriginal,linkcompleto,tipo,data)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)''',
+            (loja,jogo,preco,pdesconto,poriginal,linkcompleto,tipo,data))
+        conexao.commit()
+        cursor.close()
+        conexao.close()
