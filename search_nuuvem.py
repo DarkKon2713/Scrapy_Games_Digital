@@ -231,3 +231,5 @@ def inserir_banco():
         cursor.close()
         conexao.close()
         print('Loja concluida: nuuvem ')
+
+
